@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Lancer FastAPI en arrière-plan sur le port 80
-uvicorn api:app --host 0.0.0.0 --port 80 &
+# Lancer FastAPI via Gunicorn sur le port 80
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:80 &
 
-# Lancer Streamlit sur le port 80
-streamlit run dashboard.py --server.port 80 --server.address 0.0.0.0
+# Lancer Streamlit sur le même port avec un subpath
+streamlit run dashboard.py --server.port 80 --server.address 0.0.0.0 --server.baseUrlPath /streamlit
