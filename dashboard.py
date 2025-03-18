@@ -70,7 +70,8 @@ else:
 
 # 3. Histogramme des anomalies par source de bytes
 st.write("### Histogramme des Anomalies par Source de Bytes")
-if filtered_df['src_bytes'].sum() > 0:
+
+if not filtered_df.empty and filtered_df['src_bytes'].sum() > 0:
     fig_bytes = px.histogram(filtered_df, x='src_bytes', color='anomaly', barmode='group',
                               title="Comparaison des Anomalies par Nombre de Bytes Source")
     st.plotly_chart(fig_bytes)
@@ -79,16 +80,26 @@ else:
 
 # 4. Répartition des anomalies vs connexions normales
 st.write("### Répartition des Anomalies vs Connexions Normales")
-if filtered_df['anomaly'].value_counts().sum() > 0:
-    anomaly_counts = filtered_df['anomaly'].value_counts()
-    fig_pie = px.pie(names=['Normal', 'Anomalie'], values=anomaly_counts, title="Proportion des Anomalies dans le Dataset")
-    st.plotly_chart(fig_pie)
+
+if not filtered_df.empty:
+    anomaly_counts = filtered_df['anomaly'].value_counts().reindex([0, 1], fill_value=0)
+    
+    if anomaly_counts.sum() > 0:
+        fig_pie = px.pie(
+            names=['Normal', 'Anomalie'], 
+            values=anomaly_counts.values, 
+            title="Proportion des Anomalies dans le Dataset"
+        )
+        st.plotly_chart(fig_pie)
+    else:
+        st.write("Pas de données disponibles pour afficher la répartition des anomalies.")
 else:
-    st.write("Pas de données pour afficher la répartition des anomalies.")
+    st.write("Aucune donnée après filtrage.")
 
 # 5. Boxplot des anomalies par nombre de connexions
 st.write("### Boxplot des Anomalies par Nombre de Connexions")
-if filtered_df['count'].sum() > 0:
+
+if not filtered_df.empty and filtered_df['count'].sum() > 0:
     fig_box = px.box(filtered_df, x="anomaly", y="count", title="Boxplot des Anomalies par Nombre de Connexions")
     st.plotly_chart(fig_box)
 else:
@@ -96,9 +107,29 @@ else:
 
 # 6. Heatmap des anomalies par protocole et service
 st.write("### Heatmap des Anomalies par Protocole et Service")
-if filtered_df[['protocol_type', 'service']].notnull().all(axis=1).sum() > 0:
+
+if not filtered_df.empty and filtered_df[['protocol_type', 'service']].notnull().all(axis=1).sum() > 0:
     fig_heatmap = px.density_heatmap(filtered_df, x="protocol_type", y="service", z="anomaly",
                                      title="Heatmap des Anomalies par Protocole et Service")
     st.plotly_chart(fig_heatmap)
 else:
     st.write("Pas de données pour afficher la heatmap des anomalies par protocole et service.")
+
+# 7. Distribution des anomalies par erreur rate
+st.write("### Distribution des Anomalies par Erreur Rate")
+
+if not filtered_df.empty and filtered_df['serror_rate'].sum() > 0:
+    fig_error_rate = px.histogram(filtered_df, x="serror_rate", color="anomaly", title="Erreur Rate des Anomalies")
+    st.plotly_chart(fig_error_rate)
+else:
+    st.write("Pas de données pour afficher la distribution des anomalies par erreur rate.")
+
+# 8. Répartition des anomalies par nombre de tentatives de login
+st.write("### Anomalies par Nombre de Tentatives de Connexion")
+
+if not filtered_df.empty and filtered_df['num_failed_logins'].sum() > 0:
+    fig_attempts = px.histogram(filtered_df, x="num_failed_logins", color="anomaly", barmode='group',
+                                 title="Comparaison des Anomalies par Nombre de Tentatives de Connexion")
+    st.plotly_chart(fig_attempts)
+else:
+    st.write("Pas de données pour afficher les anomalies par nombre de tentatives de connexion.")
