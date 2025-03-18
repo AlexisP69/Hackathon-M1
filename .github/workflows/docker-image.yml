@@ -52,6 +52,8 @@ jobs:
           az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.ACI_CONTAINER_NAME }} \
             --image ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest \
+            --cpu 4 \
+            --memory 7 \
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
@@ -63,7 +65,9 @@ jobs:
           az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
           az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image detection-anomalies:latest\
+            --image detection-anomalies:latest \
+            --cpu 4 \
+            --memory 7 \
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
