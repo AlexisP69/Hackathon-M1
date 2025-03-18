@@ -26,7 +26,7 @@ st.title("📡 Analyse des Connexions Réseau - Anomalies & Comparaisons")
 # Filtres interactifs
 st.sidebar.header("Filtres")
 
-# Filtres principaux : protocole, service, IP, anomalie
+# Filtres principaux : protocole, service, IP
 protocol_list = df['protocol_type'].unique()
 service_list = df['service'].unique()
 ip_list = df['src_bytes'].unique()
@@ -34,7 +34,6 @@ ip_list = df['src_bytes'].unique()
 selected_protocol = st.sidebar.selectbox("Protocole", ["Tous"] + list(protocol_list))
 selected_service = st.sidebar.selectbox("Service", ["Tous"] + list(service_list))
 selected_ip = st.sidebar.selectbox("IP Source", ["Tous"] + list(ip_list))
-selected_anomaly = st.sidebar.selectbox("Anomalie", ["Tous", "Normal", "Anomalie"])
 
 # Appliquer les filtres
 filtered_df = df.copy()
@@ -44,9 +43,6 @@ if selected_service != "Tous":
     filtered_df = filtered_df[filtered_df['service'] == selected_service]
 if selected_ip != "Tous":
     filtered_df = filtered_df[filtered_df['src_bytes'] == selected_ip]
-if selected_anomaly != "Tous":
-    anomaly_filter = 0 if selected_anomaly == "Normal" else 1
-    filtered_df = filtered_df[filtered_df['anomaly'] == anomaly_filter]
 
 # Affichage des données filtrées
 st.write("### Connexions Réseau Filtrées")
@@ -106,38 +102,3 @@ if filtered_df[['protocol_type', 'service']].notnull().all(axis=1).sum() > 0:
     st.plotly_chart(fig_heatmap)
 else:
     st.write("Pas de données pour afficher la heatmap des anomalies par protocole et service.")
-
-# 7. Distribution des anomalies par erreur rate
-st.write("### Distribution des Anomalies par Erreur Rate")
-if filtered_df['serror_rate'].sum() > 0:
-    fig_error_rate = px.histogram(filtered_df, x="serror_rate", color="anomaly", title="Erreur Rate des Anomalies")
-    st.plotly_chart(fig_error_rate)
-else:
-    st.write("Pas de données pour afficher la distribution des anomalies par erreur rate.")
-
-# 8. Répartition des anomalies par nombre de tentatives de login
-st.write("### Anomalies par Nombre de Tentatives de Connexion")
-if filtered_df['num_failed_logins'].sum() > 0:
-    fig_attempts = px.histogram(filtered_df, x="num_failed_logins", color="anomaly", barmode='group',
-                                 title="Comparaison des Anomalies par Nombre de Tentatives de Connexion")
-    st.plotly_chart(fig_attempts)
-else:
-    st.write("Pas de données pour afficher les anomalies par nombre de tentatives de connexion.")
-
-# 9. Graphique des anomalies par nombre de fichiers créés
-st.write("### Anomalies par Nombre de Fichiers Créés")
-if filtered_df['lnum_file_creations'].sum() > 0:
-    fig_file_creations = px.histogram(filtered_df, x="lnum_file_creations", color="anomaly", barmode='group',
-                                      title="Comparaison des Anomalies par Nombre de Fichiers Créés")
-    st.plotly_chart(fig_file_creations)
-else:
-    st.write("Pas de données pour afficher les anomalies par nombre de fichiers créés.")
-
-# 10. Graphique des anomalies par nombre de connexions sortantes
-st.write("### Anomalies par Nombre de Connexions Sortantes")
-if filtered_df['lnum_outbound_cmds'].sum() > 0:
-    fig_outbound = px.histogram(filtered_df, x="lnum_outbound_cmds", color="anomaly", barmode='group',
-                                 title="Comparaison des Anomalies par Nombre de Connexions Sortantes")
-    st.plotly_chart(fig_outbound)
-else:
-    st.write("Pas de données pour afficher les anomalies par connexions sortantes.")
