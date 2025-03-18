@@ -59,7 +59,9 @@ jobs:
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
             --dns-name-label detection-anomalies \
             --ports 80 \
-            --os-type Linux
+            --os-type Linux \
+            --location eastus \
+            --ip-address Public
         else
           echo "Container exists. Updating..."
           az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
@@ -73,5 +75,7 @@ jobs:
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
             --dns-name-label detection-anomalies \
             --ports 80 \
-            --os-type Linux
+            --os-type Linux \
+            --location eastus \
+            --ip-address Public
         fi
