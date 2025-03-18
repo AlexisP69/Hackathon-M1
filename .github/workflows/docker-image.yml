@@ -55,7 +55,7 @@ jobs:
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label detection-anomalies:latest \
+            --dns-name-label detection-anomalies \
             --ports 80 \
             --os-type Linux
         else
@@ -67,7 +67,7 @@ jobs:
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label detection-anomalies:latest \
+            --dns-name-label detection-anomalies \
             --ports 80 \
             --os-type Linux
         fi
