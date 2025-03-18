@@ -49,33 +49,9 @@ jobs:
       run: |
         if [ -f aci_status.txt ]; then
           echo "Container does not exist. Creating new instance..."
-          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image hackathonynovgp2.azurecr.io/detection-anomalies:latest \
-            --cpu 4 \
-            --memory 7 \
-            --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
-            --registry-username ${{ secrets.ACR_USERNAME }} \
-            --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label detection-anomalies \
-            --ports 80 \
-            --os-type Linux \
-            --location eastus \
-            --ip-address Public
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --image hackathonynovgp2.azurecr.io/detection-anomalies:latest --cpu 4 --memory 7 --registry-login-server ${{ secrets.ACR_NAME }} --registry-username ${{ secrets.ACR_USERNAME }} --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} --dns-name-label detection-anomalies --ports 80 --os-type Linux --location eastus --ip-address Public
         else
           echo "Container exists. Updating..."
           az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
-          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image hackathonynovgp2.azurecr.io/detection-anomalies:latest \
-            --cpu 4 \
-            --memory 7 \
-            --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
-            --registry-username ${{ secrets.ACR_USERNAME }} \
-            --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label detection-anomalies \
-            --ports 80 \
-            --os-type Linux \
-            --location eastus \
-            --ip-address Public
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --image hackathonynovgp2.azurecr.io/detection-anomalies:latest --cpu 4 --memory 7 --registry-login-server ${{ secrets.ACR_NAME }} --registry-username ${{ secrets.ACR_USERNAME }} --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} --dns-name-label detection-anomalies --ports 80 --os-type Linux --location eastus --ip-address Public
         fi
