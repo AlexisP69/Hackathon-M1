@@ -24,13 +24,11 @@ jobs:
 
     - name: Build and Tag Docker Image
       run: |
-        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }} .
-        docker tag ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }} ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest
-
+        docker build -t detection-anomalies .   
+        docker tag detection-anomalies hackathonynovgp2.azurecr.io/detection-anomalies:latest
     - name: Push Docker Image to ACR
       run: |
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }}
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest
+        docker push hackathonynovgp2.azurecr.io/detection-anomalies:latest   
 
   deploy:
     needs: build-and-push
@@ -57,17 +55,17 @@ jobs:
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label my-app-${{ github.run_id }} \
+            --dns-name-label detection-anomalies:latest \
             --ports 80
         else
           echo "Container exists. Updating..."
           az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
           az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest \
+            --image detection-anomalies:latest\
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
-            --dns-name-label my-app-${{ github.run_id }} \
+            --dns-name-label detection-anomalies:latest \
             --ports 80
         fi
