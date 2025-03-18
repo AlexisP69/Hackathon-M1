@@ -1,18 +1,26 @@
-# Utilisation de Python 3.12 comme base
+# Utiliser une image Python officielle
 FROM python:3.12
 
-# Définition du répertoire de travail
+# Installer Nginx
+RUN apt-get update && apt-get install -y nginx && apt-get clean
+ 
+# Définir le répertoire de travail
 WORKDIR /app
-
+ 
 # Copier les fichiers du projet
 COPY . /app
+ 
+# Copier la configuration Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Mise à jour de pip et installation des dépendances
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir tensorflow pandas numpy scikit-learn fastapi uvicorn streamlit requests joblib plotly pymongo gunicorn
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Exposition des ports
-EXPOSE 80 8501
+# Exposer le port pour nginx FastAPI (8000) et Streamlit (8501)
+EXPOSE 80
 
-# Lancer les services avec un script
+# Rendre exécutable l'entrypoint
+RUN chmod +x entrypoint.sh
+
+# Lancer l'application via un script d'entrée (entrypoint.sh)
 CMD ["bash", "entrypoint.sh"]

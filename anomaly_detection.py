@@ -18,7 +18,7 @@ for col in ["protocol_type", "service", "flag"]:
     df[col] = LabelEncoder().fit_transform(df[col])
 
 # Correction des labels (0 = normal, 1 = anomalie)
-df['anomaly'] = df['label'].apply(lambda x: 1 if x == 'neptune' else 0)
+df['anomaly'] = df['label'].apply(lambda x: 0 if x == 'normal' else 1)
 df.drop(columns=['label'], inplace=True)
 
 # Normalisation des données
