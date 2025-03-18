@@ -1,0 +1,73 @@
+name: Build and Deploy to Azure ACI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Log in to Azure Container Registry (ACR)
+      run: |
+        echo "${{ secrets.AZURE_ACR_PASSWORD }}" | docker login ${{ secrets.ACR_NAME }}.azurecr.io -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Build and Tag Docker Image
+      run: |
+        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }} .
+        docker tag ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }} ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest
+
+    - name: Push Docker Image to ACR
+      run: |
+        docker push ${{ secrets.ACR_NAME }}.azurecr.io/my-app:${{ github.sha }}
+        docker push ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Check if ACI Instance Exists
+      id: check-aci
+      run: |
+        az container show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} >/dev/null 2>&1 || echo "notfound" > aci_status.txt
+
+    - name: Deploy or Update Azure Container Instance (ACI)
+      run: |
+        if [ -f aci_status.txt ]; then
+          echo "Container does not exist. Creating new instance..."
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.ACI_CONTAINER_NAME }} \
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest \
+            --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
+            --dns-name-label my-app-${{ github.run_id }} \
+            --ports 80
+        else
+          echo "Container exists. Updating..."
+          az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.ACI_CONTAINER_NAME }} \
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest \
+            --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
+            --dns-name-label my-app-${{ github.run_id }} \
+            --ports 80
+        fi
