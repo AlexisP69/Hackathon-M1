@@ -56,7 +56,7 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
             --dns-name-label detection-anomalies:latest \
-            --ports 80
+            --ports 80 \
             --os-type Linux
         else
           echo "Container exists. Updating..."
@@ -68,6 +68,6 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.AZURE_ACR_PASSWORD }} \
             --dns-name-label detection-anomalies:latest \
-            --ports 80
+            --ports 80 \
             --os-type Linux
         fi
