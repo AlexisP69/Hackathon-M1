@@ -133,3 +133,23 @@ if not filtered_df.empty and filtered_df['num_failed_logins'].sum() > 0:
     st.plotly_chart(fig_attempts)
 else:
     st.write("Pas de données pour afficher les anomalies par nombre de tentatives de connexion.")
+    
+# 9. Graphique des anomalies par nombre de fichiers créés
+st.write("### Anomalies par Nombre de Fichiers Créés")
+
+if not filtered_df.empty and 'lnum_file_creations' in filtered_df.columns and filtered_df['lnum_file_creations'].sum() > 0:
+    fig_file_creations = px.histogram(filtered_df, x="lnum_file_creations", color="anomaly", barmode='group',
+                                      title="Comparaison des Anomalies par Nombre de Fichiers Créés")
+    st.plotly_chart(fig_file_creations)
+else:
+    st.write("Pas de données pour afficher les anomalies par nombre de fichiers créés.")
+
+# 10. Graphique des anomalies par nombre de connexions sortantes
+st.write("### Anomalies par Nombre de Connexions Sortantes")
+
+if not filtered_df.empty and 'lnum_outbound_cmds' in filtered_df.columns and filtered_df['lnum_outbound_cmds'].sum() > 0:
+    fig_outbound = px.histogram(filtered_df, x="lnum_outbound_cmds", color="anomaly", barmode='group',
+                                 title="Comparaison des Anomalies par Nombre de Connexions Sortantes")
+    st.plotly_chart(fig_outbound)
+else:
+    st.write("Pas de données pour afficher les anomalies par connexions sortantes.")
