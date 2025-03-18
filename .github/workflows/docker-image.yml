@@ -51,7 +51,7 @@ jobs:
           echo "Container does not exist. Creating new instance..."
           az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image ${{ secrets.ACR_NAME }}.azurecr.io/my-app:latest \
+            --image hackathonynovgp2.azurecr.io/detection-anomalies:latest \
             --cpu 4 \
             --memory 7 \
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
@@ -65,7 +65,7 @@ jobs:
           az container delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.ACI_CONTAINER_NAME }} --yes
           az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.ACI_CONTAINER_NAME }} \
-            --image detection-anomalies:latest \
+            --image hackathonynovgp2.azurecr.io/detection-anomalies:latest \
             --cpu 4 \
             --memory 7 \
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
